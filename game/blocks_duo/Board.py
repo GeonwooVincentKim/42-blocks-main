@@ -135,27 +135,47 @@ class Board:
 
         @staticmethod
         def __decorate_edge(map_):
-            edge_left = np.array([[0, 1]])
-            edge_right = np.array([[1, 0]])
+            edge_patterns = {
+                'left': (np.array([[0, 1]]), (0, 0)),
+                'right': (np.array([[1, 0]]), (0, 1)),
+                'top': (np.array([[0], [1]]), (0, 0)),
+                'bottom': (np.array([[1], [0]]), (1, 0)),
+            }
 
-            vertical_windows = np.lib.stride_tricks.sliding_window_view(map_, [1, 2], writeable=True)
-            for vertical_windows_row in vertical_windows:
-                for vertical_window in vertical_windows_row:
-                    if np.all(vertical_window == edge_left):
-                        vertical_window[0, 0] = 3
-                    elif np.all(vertical_window == edge_right):
-                        vertical_window[0, 1] = 3
+            # edge_left = np.array([[0, 1]])
+            # edge_right = np.array([[1, 0]])
 
-            edge_top = np.array([[0], [1]])
-            edge_bottom = np.array([[1], [0]])
+            horizontal_windows = np.lib.stride_tricks.sliding_window_view(map_, [1, 2], writeable=True)
+            # for vertical_windows_row in vertical_windows:
+            #     for vertical_window in vertical_windows_row:
+            #         if np.all(vertical_window == edge_left):
+            #             vertical_window[0, 0] = 3
+            #         elif np.all(vertical_window == edge_right):
+            #             vertical_window[0, 1] = 3
+            for edge_type in ['left', 'right']:
+                pattern, position = edge_patterns[edge_type]
+                for window_row in horizontal_windows:
+                    for window in window_row:
+                        if np.all(window == pattern):
+                            window[position] = 3
+
+
+            # edge_top = np.array([[0], [1]])
+            # edge_bottom = np.array([[1], [0]])
 
             vertical_windows = np.lib.stride_tricks.sliding_window_view(map_, [2, 1], writeable=True)
-            for vertical_windows_row in vertical_windows:
-                for vertical_window in vertical_windows_row:
-                    if np.all(vertical_window == edge_top):
-                        vertical_window[0, 0] = 3
-                    elif np.all(vertical_window == edge_bottom):
-                        vertical_window[1, 0] = 3
+            for edge_type in ['top', 'bottom']:
+                pattern, position = edge_patterns[edge_type]
+                for window_row in vertical_windows:
+                    for window in window_row:
+                        if np.all(window == pattern):
+                            window[position] = 3
+            # for vertical_windows_row in vertical_windows:
+            #     for vertical_window in vertical_windows_row:
+            #         if np.all(vertical_window == edge_top):
+            #             vertical_window[0, 0] = 3
+            #         elif np.all(vertical_window == edge_bottom):
+            #             vertical_window[1, 0] = 3
 
         @property
         def map(self):
